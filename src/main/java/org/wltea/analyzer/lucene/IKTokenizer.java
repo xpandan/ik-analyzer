@@ -32,8 +32,8 @@ import java.io.Reader;
 import org.apache.lucene.analysis.Tokenizer;
 import org.apache.lucene.analysis.tokenattributes.CharTermAttribute;
 import org.apache.lucene.analysis.tokenattributes.OffsetAttribute;
+import org.apache.lucene.analysis.tokenattributes.PositionIncrementAttribute;
 import org.apache.lucene.analysis.tokenattributes.TypeAttribute;
-
 import org.wltea.analyzer.core.IKSegmenter;
 import org.wltea.analyzer.core.Lexeme;
 
@@ -55,6 +55,9 @@ public final class IKTokenizer extends Tokenizer {
 	//记录最后一个词元的结束位置
 	private int endPosition;
 	
+	private int skippedPositions;
+	
+	private PositionIncrementAttribute posIncrAtt;
 	/**
 	 * Lucene 4.0 Tokenizer适配器类构造函数
 	 * @param in
@@ -65,6 +68,8 @@ public final class IKTokenizer extends Tokenizer {
 	    offsetAtt = addAttribute(OffsetAttribute.class);
 	    termAtt = addAttribute(CharTermAttribute.class);
 	    typeAtt = addAttribute(TypeAttribute.class);
+	    posIncrAtt = addAttribute(PositionIncrementAttribute.class);		
+	    
 		_IKImplement = new IKSegmenter(input , useSmart);
 	}
 
@@ -75,15 +80,18 @@ public final class IKTokenizer extends Tokenizer {
 	public boolean incrementToken() throws IOException {
 		//清除所有的词元属性
 		clearAttributes();
+		skippedPositions = 0;
+		
 		Lexeme nextLexeme = _IKImplement.next();
 		if(nextLexeme != null){
+			posIncrAtt.setPositionIncrement(skippedPositions + 1);
 			//将Lexeme转成Attributes
 			//设置词元文本
 			termAtt.append(nextLexeme.getLexemeText());
 			//设置词元长度
 			termAtt.setLength(nextLexeme.getLength());
 			//设置词元位移
-			offsetAtt.setOffset(nextLexeme.getBeginPosition(), nextLexeme.getEndPosition());
+			offsetAtt.setOffset(correctOffset(nextLexeme.getBeginPosition()), correctOffset(nextLexeme.getEndPosition()));
 			//记录分词的最后位置
 			endPosition = nextLexeme.getEndPosition();
 			//记录词元分类
@@ -103,12 +111,16 @@ public final class IKTokenizer extends Tokenizer {
 	public void reset() throws IOException {
 		super.reset();
 		_IKImplement.reset(input);
+		skippedPositions = 0;
 	}	
 	
 	@Override
-	public final void end() {
+	public final void end() throws IOException{
+		super.end();
 	    // set final offset
 		int finalOffset = correctOffset(this.endPosition);
 		offsetAtt.setOffset(finalOffset, finalOffset);
+		 // adjust any skipped tokens
+	    posIncrAtt.setPositionIncrement(posIncrAtt.getPositionIncrement() + skippedPositions);
 	}
 }
