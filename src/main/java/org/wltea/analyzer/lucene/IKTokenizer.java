@@ -84,7 +84,7 @@ public final class IKTokenizer extends Tokenizer {
 		
 		Lexeme nextLexeme = _IKImplement.next();
 		if(nextLexeme != null){
-			posIncrAtt.setPositionIncrement(skippedPositions +1 );
+			posIncrAtt.setPositionIncrement(skippedPositions + 1);
 			//将Lexeme转成Attributes
 			//设置词元文本
 			termAtt.append(nextLexeme.getLexemeText());
