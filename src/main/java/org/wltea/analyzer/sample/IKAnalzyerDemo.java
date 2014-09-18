@@ -49,7 +49,7 @@ public class IKAnalzyerDemo {
 		//获取Lucene的TokenStream对象
 	    TokenStream ts = null;
 		try {
-			ts = analyzer.tokenStream("myfield", new StringReader("123-456 cat-dog 英-国 123-国 123-456 cat-国这是一个中文分词的例子，你可以直接运行它！IK Analyer can analyze the English text, too."));
+			ts = analyzer.tokenStream("myfield", new StringReader("这是一个中文分词的例子，你可以直接运行它！IK Analyer can analyze the English text, too."));
 			//获取词元位置属性
 		    OffsetAttribute  offset = ts.addAttribute(OffsetAttribute.class); 
 		    //获取词元文本属性

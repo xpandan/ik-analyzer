@@ -52,7 +52,8 @@ class CharacterUtil {
 			return CHAR_ARABIC;
 			
 		}else if((input >= 'a' && input <= 'z')
-				|| (input >= 'A' && input <= 'Z')){
+				|| (input >= 'A' && input <= 'Z')
+				|| (input == '_')){
 			return CHAR_ENGLISH;
 			
 		}else {

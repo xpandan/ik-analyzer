@@ -34,8 +34,9 @@ class LetterSegmenter implements ISegmenter {
 	
 	//子分词器标签
 	static final String SEGMENTER_NAME = "LETTER_SEGMENTER";
+	
 	//链接符号
-	private static final char[] Letter_Connector = new char[]{'#', '&', '$', '@', '_'};
+	private static final char[] Letter_Connector = new char[]{'_'};
 	
 	//数字符号
 	private static final char[] Num_Connector = new char[]{',', '.'};
